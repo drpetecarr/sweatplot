@@ -20,3 +20,9 @@ urlpatterns = [
     url(r'^sweatplot/', include('sweatplot_app.urls')),
     url(r'^admin/', admin.site.urls),
 ]
+
+# You might need to import static function like this:
+from django.contrib.staticfiles.urls import static, staticfiles_urlpatterns, settings
+
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
