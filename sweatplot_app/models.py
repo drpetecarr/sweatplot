@@ -27,7 +27,7 @@ class Patient(Model):
     name = CharField(max_length=50)
     age = CharField(default='0', max_length=20)
     diagnosis = CharField(max_length=300)
-    gender = CharField(choices=[('1', 'Female'), ('2', 'Male'), ('3', 'Other')], max_length=10)
+    gender = CharField(choices=[('Female', 'Female'), ('Male', 'Male'), ('Other', 'Other')], max_length=10)
     objects = PatientManager()
 
     def __str__(self) -> str:

@@ -1,4 +1,14 @@
-<header>
+<h1>
 {{ session }}
-</header>
-<body>{{ session.phase_data }}</body>
+</h1>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/duration">Duration</a> &ensp; {{ session.duration }}</li>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/left_shift">Duration</a> &ensp; {{ session.left_shift }}</li>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/right_shift">Duration</a> &ensp; {{ session.right_shift }}</li>
+<h2> Convergence </h2>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/convergence_score">Score</a> &ensp; {{ session.convergence_score }}</li>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/convergence_magnitudes/graph">Magnitudes Graph</a></li>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/convergence_magnitudes/table">Magnitudes Table</a></li>
+<h2> Divergence </h2>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/divergence_score">Score</a>&ensp;  {{ session.divergence_score }}</li>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/divergence_magnitudes/graph">Magnitudes Graph</a></li>
+<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/divergence_magnitudes/table">Magnitudes Table</a></li>

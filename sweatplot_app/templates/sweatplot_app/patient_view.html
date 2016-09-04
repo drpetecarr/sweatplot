@@ -1,6 +1,28 @@
+<h1> {{ patient }}</h1>
+
 <table>
-        <tr>{{ patient.name }}</tr>
-        <td>{{ patient.age }}</td>
-        <td>{{ patient.diagnosis }}</td>
-        <td>{{ patient.gender }}</td>
+  <tr>
+      <th>Name</th>
+      <th>Gender</th>
+      <th>Age</th>
+      <th> Diagnosis</th>
+  </tr>
+  <tr>
+      <td>{{ patient.name }}</td>
+      <td>{{ patient.gender }}</td>
+      <td>{{ patient.age }}</td>
+      <td>{{ patient.diagnosis }}</td>
+  </tr>
 </table>
+
+<h1> Sessions </h1>
+
+{% if patient %}
+    <ul>
+    {% for session in sessions %}
+        <li><a href="/sweatplot/{{ patient }}/{{ session.number }}">{{ session.number }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No sessions are available.</p>
+{% endif %}

@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from .models import Patient, Session
 
 
@@ -11,13 +11,14 @@ def patient_list(request: HttpRequest) -> HttpResponse:
 
 def patient_view(request: HttpRequest, patient_name: str) -> HttpResponse:
     patient = get_object_or_404(Patient, name=patient_name)
-    return render(request, 'sweatplot_app/patient_view.html', {'patient': patient})
+    sessions = get_list_or_404(Session, patient=patient)
+    return render(request, 'sweatplot_app/patient_view.html', {'patient': patient, 'sessions': sessions})
 
 
 def session_view(request: HttpRequest, patient_name: str, session_number: str) -> HttpResponse:
     patient = get_object_or_404(Patient, name=patient_name)
     session = get_object_or_404(Session, patient=patient, number=session_number)
-    return render(request, 'sweatplot_app/session_view.html', {'session': session})
+    return render(request, 'sweatplot_app/session_view.html', {'session': session, 'patient': patient})
 
 
 def graph_view(request: HttpRequest, patient_name: str, session_number: str) -> HttpResponse:
