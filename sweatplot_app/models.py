@@ -1,9 +1,19 @@
-from django.db.models import Model, CharField, ForeignKey, IntegerField, DateTimeField, CASCADE, Manager, FileField, FilePathField
+import csv
+
+from django.db.models import Model, CharField, ForeignKey, IntegerField, DateTimeField, CASCADE, Manager, FileField, \
+    FilePathField
 from django.contrib import admin
 import os
 import pandas as pd
 import numpy as np
 from typing import List
+import matplotlib
+
+matplotlib.use('Qt4Agg')
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_style("whitegrid")
 
 
 class SessionAdmin(admin.ModelAdmin):
@@ -11,6 +21,7 @@ class SessionAdmin(admin.ModelAdmin):
     After save is pressed in admin view, the Session needs to read in csv file
     and save as a pd.DataFrame variable.
     """
+
     def save_model(self, request, obj, form, change):
         obj.save()
 
@@ -45,7 +56,7 @@ def measure(func: classmethod) -> classmethod:
     def add_then_call(*args, **kwargs):
         func.measure = True
         return func(*args, **kwargs)
-
+    add_then_call.__name__ = func.__name__
     return add_then_call
 
 
@@ -59,7 +70,7 @@ def additive(func: classmethod) -> classmethod:
     def add_then_call(*args, **kwargs):
         func.additive = True
         return func(*args, **kwargs)
-
+    add_then_call.__name__ = func.__name__
     return add_then_call
 
 
@@ -70,8 +81,61 @@ def clean_df(func: classmethod) -> classmethod:
         assert args[0].df() is not None
         assert len(args[0].df()) > 10  # make sure data isn't too small
         return func(*args, **kwargs)
-
+    clean_then_call.__name__ = func.__name__
     return clean_then_call
+
+
+def to_csv(measure_func: classmethod, patient_name: str):
+    """
+    Saves a csv of the result to a 'Patients' directory located in the working dir.
+    measure_func can return either a value or an iterable.
+    :param patient_name: str
+    :param measure_func: classmethod
+    """
+    result = measure_func()
+    if not os.path.exists(os.path.join(os.getcwd(), 'Patients')):  # create a 'Patients' dir if it doesnt exist
+        os.makedirs(os.path.join(os.getcwd(), 'Patients'))
+    if not os.path.exists(os.path.join(os.getcwd(), 'Patients',
+                                       patient_name)):  # create a ../Patients/patient_name dir if it doesn't exist
+        os.makedirs(os.path.join(os.getcwd(), 'Patients', patient_name))
+    new_csv_path = os.path.join(os.getcwd(), 'Patients', patient_name, measure_func.__name__ + '.csv')
+    with open(new_csv_path, 'w') as csvfile:
+        writer = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        try:
+            [writer.writerow(row) for row in result]
+        except:
+            writer.writerow(result)
+
+
+# TODO decide what to do with this
+def create_table(measure_func: classmethod, image_path='temp_plot.jpg') -> str:
+    """
+    Saves a table of the measures output and returns the image path.
+    :param image_path: str
+    :param measure_func: classmethod
+    :return: str
+    """
+    result = measure_func()
+    plt.figure()
+    plt.table(result)
+    plt.save_fig(os.path.join(os.getcwd(), 'sweatplot_app', 'static', 'sweatplot_app', image_path))
+    plt.close()
+    return image_path
+
+
+def create_graph(measure_func: classmethod, image_path='temp_plot.jpg') -> str:
+    """
+    Saves a graph of the measures output and returns the image path.
+    :param image_path: str
+    :param measure_func: classmethod
+    :return: str
+    """
+    result = measure_func()
+    plt.figure()
+    plt.plot(result)
+    plt.savefig(os.path.join(os.getcwd(), 'sweatplot_app', 'static', 'sweatplot_app', image_path))
+    plt.close()
+    return image_path
 
 
 class Session(Model):
@@ -97,7 +161,7 @@ class Session(Model):
         measures = dict()
         method_list = []
         for func_str in dir(self):
-            if not func_str == 'objects' and not func_str.startswith("__") and not\
+            if not func_str == 'objects' and not func_str.startswith("__") and not \
                     func_str.startswith('measure_dictionary') and callable(getattr(self, func_str)):
                 method_list.append(func_str)
         for func_str in method_list:
@@ -120,7 +184,6 @@ class Session(Model):
         if self._df is None:
             self._df = pd.read_csv(os.path.join(os.getcwd(), self.csv.name))[trim_start_by:].reset_index()
         return self._df
-
 
     @clean_df
     @measure
@@ -188,6 +251,70 @@ class Session(Model):
                 if bot[i] < bot[i - 1]:  # bot is decreasing. Therefore they're diverging
                     size_of_divergence = top[i] - top[i - 1] + bot[i - 1] - bot[i]
                     magnitudes[i] = size_of_divergence
+        return magnitudes
+
+    @measure
+    @additive
+    @clean_df
+    def divergence_magnitudes_split(self) -> List[tuple]:
+        """
+        Returns List with size of df length with (0,0) for every non-divergent value
+        and with magnitude of left, right divergence respectively for divergent values.
+        So if there is a divergence and left hand is top, then tuple will have positive
+        first value and negative second value.
+        :return: list(tuple(float, float))
+        """
+        magnitudes = [(0, 0)] * len(self.right_hand_data())
+        for i in range(len(self.right_hand_data())):
+            if i == 0:
+                continue
+            top = self.left_hand_data().copy()
+            bot = self.right_hand_data().copy()
+            left_top = True
+            if top[i] < bot[i]:  # then swap them round
+                left_top = False
+                top, bot = bot, top
+            if top[i] > top[i - 1]:  # top is increasing
+                if bot[i] < bot[i - 1]:  # bot is decreasing. Therefore they're diverging
+                    size_of_top_div = top[i] - top[i - 1]
+                    size_of_bot_div = bot[i] - bot[i - 1]
+                    if left_top:
+                        magnitudes[i] = (size_of_top_div, size_of_bot_div)
+                        continue
+                    magnitudes[i] = (size_of_bot_div, size_of_top_div)
+
+        return magnitudes
+
+    @measure
+    @additive
+    @clean_df
+    def convergence_magnitudes_split(self) -> List[tuple]:
+        """
+        Returns List with size of df length with (0,0) for every non-convergent value
+        and with magnitude of left, right convergence respectively for convergent values.
+        So if there is a convergence and left hand is top, then tuple will have positive
+        first value and negative second value.
+        :return: list(tuple(float, float))
+        """
+        magnitudes = [(0, 0)] * len(self.right_hand_data())
+        for i in range(len(self.right_hand_data())):
+            if i == 0:
+                continue
+            top = self.left_hand_data().copy()
+            bot = self.right_hand_data().copy()
+            left_top = True
+            if top[i] < bot[i]:  # then swap them round
+                left_top = False
+                top, bot = bot, top
+            if top[i] < top[i - 1]:  # top is decreasing
+                if bot[i] > bot[i - 1]:  # bot is increasing. Therefore they're converging
+                    size_of_top_con = top[i] - top[i - 1]
+                    size_of_bot_con = bot[i] - bot[i - 1]
+                    if left_top:
+                        magnitudes[i] = (size_of_top_con, size_of_bot_con)
+                        continue
+                    magnitudes[i] = (size_of_bot_con, size_of_top_con)
+
         return magnitudes
 
     @clean_df
@@ -366,5 +493,3 @@ class Session(Model):
         :return: List[int]
         """
         return [len(bag) for bag in bags]
-
-
