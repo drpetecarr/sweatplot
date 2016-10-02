@@ -1,14 +1,154 @@
-<h1>
-{{ session }}
-</h1>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/duration">Duration</a> &ensp; {{ session.duration }}</li>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/left_shift">Duration</a> &ensp; {{ session.left_shift }}</li>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/right_shift">Duration</a> &ensp; {{ session.right_shift }}</li>
-<h2> Convergence </h2>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/convergence_score">Score</a> &ensp; {{ session.convergence_score }}</li>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/convergence_magnitudes/graph">Magnitudes Graph</a></li>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/convergence_magnitudes/table">Magnitudes Table</a></li>
-<h2> Divergence </h2>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/divergence_score">Score</a>&ensp;  {{ session.divergence_score }}</li>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/divergence_magnitudes/graph">Magnitudes Graph</a></li>
-<li><a href="/sweatplot/{{ patient }}/{{ session.number }}/divergence_magnitudes/table">Magnitudes Table</a></li>
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<body>
+<div class="container">
+    <h1>{{ session }}</h1>
+    <p class="lead">{{ patient }}</p>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Duration</th>
+                <th>Left shift</th>
+                <th>Right shift</th>
+                <th>Total shift</th>
+            </tr>
+            <tr>
+                <td>{{ session.duration }} seconds</td>
+                <td>{{ session.left_shift }}</td>
+                <td>{{ session.right_shift }}</td>
+                <td>{{ session.total_shift }}</td>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <br>
+    <br>
+    <h2>Convergence</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Score</td>
+                <td>{{ session.convergence_score }}</td>
+            </tr>
+            <tr>
+                <td>Total magnitudes</td>
+                <td>{{ session.convergence_magnitudes_total }}</td>
+            </tr>
+            <tr>
+                <td>Total magnitudes split</td>
+                <td>{{ session.convergence_magnitudes_split_total }}</td>
+            </tr>
+            <tr>
+                <td>Mean</td>
+                <td>{{ session.mean_convergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Median</td>
+                <td>{{ session.median_convergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Variance</td>
+                <td>{{ session.variance_convergence_magnitudes }}</td>
+            </tr>
+            </thead>
+        </table>
+        <a href="{{graph_convergence_magnitudes}}" class="btn btn-primary">Graph magnitudes</a>
+        <a href="{{save_convergence_magnitudes}}" class="btn btn-primary">Save as csv</a>
+        <br>
+        <br>
+        <a href="{{graph_convergence_magnitudes_by_hand}}" class="btn btn-primary">Graph magnitudes separated by hand</a>
+        <a href="{{save_convergence_magnitudes_by_hand}}" class="btn btn-primary">Save as csv</a>
+    </div>
+    <br>
+    <br>
+    <h2>Divergence</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Score</td>
+                <td>{{ session.divergence_score }}</td>
+            </tr>
+            <tr>
+                <td>Total of absolute magnitudes</td>
+                <td>{{ session.divergence_magnitudes_total }}</td>
+            </tr>
+            <tr>
+                <td>Total of absolute magnitudes split by hand</td>
+                <td>{{ session.divergence_magnitudes_split_total }}</td>
+            </tr>
+            <tr>
+                <td>Mean of magnitudes</td>
+                <td>{{ session.mean_divergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Median of magnitudes</td>
+                <td>{{ session.median_divergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Variance of magnitudes</td>
+                <td>{{ session.variance_divergence_magnitudes }}</td>
+            </tr>
+            </thead>
+        </table>
+        <a href="{{graph_divergence_magnitudes}}" class="btn btn-primary">Graph magnitudes</a>
+        <a href="{{save_divergence_magnitudes}}" class="btn btn-primary">Save as csv</a>
+        <br>
+        <br>
+        <a href="{{graph_divergence_magnitudes_by_hand}}" class="btn btn-primary">Graph magnitudes separated by hand</a>
+        <a href="{{save_divergence_magnitudes_by_hand}}" class="btn btn-primary">Save as csv</a>
+    </div>
+    <br>
+    <br>
+    <h2>Phase</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Bands</td>
+                <td>{{ session.phase_bands }}</td>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <a href="{{ phase_raw_data }}" class="btn btn-primary">Raw data</a>
+    <br>
+    <br>
+    <a href="{{ convergence_by_phase_bar_chart }}" class="btn btn-primary">Bar chart against convergence</a>
+    <a href="{{ convergence_by_phase_csv}}" class="btn btn-primary">Save as csv</a>
+    <br>
+    <br>
+    <a href="{{ divergence_by_phase_bar_chart }}" class="btn btn-primary">Bar chart against divergence</a>
+    <a href="{{ divergence_by_phase_csv }}" class="btn btn-primary">Save as csv</a>
+    <br>
+    <br>
+    <h2>Frequency</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Bands</td>
+                <td>{{ session.frequency_bands }}</td>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <a href="{{ frequency_raw_data }}" class="btn btn-primary">Raw data</a>
+    <br>
+    <br>
+    <a href="{{ convergence_by_frequency_bar_chart }}" class="btn btn-primary">Bar chart against convergence</a>
+    <a href="{{ convergence_by_frequency_csv}}" class="btn btn-primary">Save as csv</a>
+    <br>
+    <br>
+    <a href="{{ divergence_by_frequency_bar_chart }}" class="btn btn-primary">Bar chart against divergence</a>
+    <a href="{{ divergence_by_frequency_csv }}" class="btn btn-primary">Save as csv</a>
+</div>
+<br>
+<br>
+<br>
+<br>
+</body>

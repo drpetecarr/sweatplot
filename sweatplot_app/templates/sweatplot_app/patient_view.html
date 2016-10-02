@@ -1,28 +1,213 @@
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+
+<body>
+<div class="container">
 <h1> {{ patient }}</h1>
-
-<table>
-  <tr>
-      <th>Name</th>
-      <th>Gender</th>
-      <th>Age</th>
-      <th> Diagnosis</th>
-  </tr>
-  <tr>
-      <td>{{ patient.name }}</td>
-      <td>{{ patient.gender }}</td>
-      <td>{{ patient.age }}</td>
-      <td>{{ patient.diagnosis }}</td>
-  </tr>
-</table>
-
-<h1> Sessions </h1>
-
-{% if patient %}
-    <ul>
-    {% for session in sessions %}
-        <li><a href="/sweatplot/{{ patient }}/{{ session.number }}">{{ session.number }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No sessions are available.</p>
-{% endif %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Diagnosis</th>
+        </tr>
+        <tr>
+            <td>{{ patient.age }}</td>
+            <td>{{ patient.gender }}</td>
+            <td>{{ patient.diagnosis}}</td>
+        </tr>
+        </thead>
+    </table>
+</div>
+    <br>
+    <br>
+    <h2> Sessions </h2>
+    <div class="=col-md-8">
+        {% if patient %}
+        <ul>
+            {% for session in sessions %}
+            <div class="row"><li><a href="/sweatplot/{{ patient }}/{{ session.number }}">{{ session.number }}</a></li></div>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="row"><p>No sessions are available.</p></div>
+        {% endif %}
+    </div>
+    <br>
+    <br>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Number of sessions</th>
+                <th>Mean left shift</th>
+                <th>Right shift</th>
+                <th>Total shift</th>
+            </tr>
+            <tr>
+                <td>{{ number_of_sessions }}</td>
+                <td>{{ mean_left_shift }}</td>
+                <td>{{ mean_right_shift }}</td>
+                <td>{{ mean_total_shift }}</td>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <br>
+    <br>
+    <h2>Convergence</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Score</td>
+                <td>{{ mean_convergence_score }}</td>
+            </tr>
+            <tr>
+                <td>Mean of absolute magnitudes</td>
+                <td>{{ multiple_sessions.mean_convergence_magnitudes_total }}</td>
+            </tr>
+            <tr>
+                <td>Mean of absolute magnitudes split by hand</td>
+                <td>{{ multiple_sessions.mean_convergence_magnitudes_split_total }}</td>
+            </tr>
+            <tr>
+                <td>Mean of magnitudes</td>
+                <td>{{ mean_mean_convergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Median of magnitudes</td>
+                <td>{{ mean_median_convergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Variance of magnitudes</td>
+                <td>{{ mean_variance_convergence_magnitudes }}</td>
+            </tr>
+            </thead>
+        </table>
+        <a href="{{ graph_convergence_magnitudes_against_time_url }}" class="btn btn-primary">Graph magnitudes against time</a>
+        <a href="{{ save_convergence_magnitudes_against_time_url }}" class="btn btn-primary">Save as csv</a>
+        <br>
+        <br>
+        <a href="{{ graph_convergence_magnitudes_by_hand_against_time_url }}" class="btn btn-primary">Graph magnitudes separated by hand against time</a>
+        <a href="{{ save_convergence_magnitudes_by_hand_against_time_url }}" class="btn btn-primary">Save as csv</a>
+    </div>
+    <br>
+    <br>
+    <h2>Divergence</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td>Score</td>
+                <td>{{ mean_divergence_score }}</td>
+            </tr>
+            <tr>
+                <td>Mean of absolute magnitudes</td>
+                <td>{{ multiple_sessions.mean_divergence_magnitudes_total }}</td>
+            </tr>
+            <tr>
+                <td>Mean of absolute magnitudes split by hand</td>
+                <td>{{ multiple_sessions.mean_divergence_magnitudes_split_total }}</td>
+            </tr>
+            <tr>
+                <td>Mean of magnitudes</td>
+                <td>{{ mean_mean_divergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Median of magnitudes</td>
+                <td>{{ mean_median_divergence_magnitudes }}</td>
+            </tr>
+            <tr>
+                <td>Variance of magnitudes</td>
+                <td>{{ mean_variance_divergence_magnitudes }}</td>
+            </tr>
+            </thead>
+        </table>
+        <a href="{{ graph_divergence_magnitudes_against_time_url }}" class="btn btn-primary">Graph magnitudes against time</a>
+        <a href="{{ save_divergence_magnitudes_against_time_url }}" class="btn btn-primary">Save as csv</a>
+        <br>
+        <br>
+        <a href="{{ graph_divergence_magnitudes_by_hand_against_time_url }}" class="btn btn-primary">Graph magnitudes separated by hand against time</a>
+        <a href="{{ save_divergence_magnitudes_by_hand_against_time_url }}" class="btn btn-primary">Save as csv</a>
+    </div>
+    <br>
+    <br>
+    <h2>Phase</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <div class="col-md-8">
+                <tr>
+                    <th>Bands</th>
+                    <th>Number of sessions with bands</th>
+                </tr>
+                {% if patient %}
+                <ul>
+                    {% for cb in phase_bands_count %}
+                    <tr>
+                        <td>{{ cb.pop }}</td>
+                        <td>{{ cb.pop }}</td>
+                    </tr>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="row">
+                    <td>No sessions are available.</td>
+                    <td></td>
+                </div>
+                {% endif %}
+            </div>
+            </thead>
+        </table>
+    </div>
+    <a href="{{ bar_convergence_by_phase_url }}" class="btn btn-primary">Bar chart against convergence</a>
+    <a href="{{ save_convergence_by_phase_url }}" class="btn btn-primary">Save as csv</a>
+    <br>
+    <br>
+    <a href="{{ bar_divergence_by_phase_url }}" class="btn btn-primary">Bar chart against divergence</a>
+    <a href="{{ save_divergence_by_phase_url }}" class="btn btn-primary">Save as csv</a>
+    <br>
+    <br>
+    <h2>Frequency</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <div class="col-md-8">
+                <tr>
+                    <th>Bands</th>
+                    <th>Number of sessions with bands</th>
+                </tr>
+                {% if patient %}
+                <ul>
+                    {% for cb in frequency_bands_count %}
+                    <tr>
+                        <td>{{ cb.pop }}</td>
+                        <td>{{ cb.pop }}</td>
+                    </tr>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="row">
+                    <td>No sessions are available.</td>
+                    <td></td>
+                </div>
+                {% endif %}
+            </div>
+            </thead>
+        </table>
+    </div>
+    <a href="{{ bar_convergence_by_frequency_url }}" class="btn btn-primary">Bar chart against convergence</a>
+    <a href="{{ save_convergence_by_frequency_url}}" class="btn btn-primary">Save as csv</a>
+    <br>
+    <br>
+    <a href="{{ bar_divergence_by_frequency_url }}" class="btn btn-primary">Bar chart against divergence</a>
+    <a href="{{ save_divergence_by_frequency_url }}" class="btn btn-primary">Save as csv</a>
+</div>
+<br>
+<br>
+<br>
+</body>
