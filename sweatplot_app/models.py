@@ -673,7 +673,7 @@ class Session(Model):
     @additive
     def divergence_magnitudes(self) -> List[float]:
         """
-        Returns List size of df length with 0 for every non-divergent value
+        Returns List size of df length with 0. for every non-divergent value
         and with the magnitude of the divergence for every divergent value.
         :return: list[float]
         """
