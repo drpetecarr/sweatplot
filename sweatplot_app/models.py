@@ -10,7 +10,6 @@ import numpy as np
 from typing import List
 import matplotlib
 
-matplotlib.use('Qt4Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -118,7 +117,7 @@ class MultipleSessions:
                 session_numbers.append([s.number])
         assert (len(bands) == len(session_numbers))
         return [(bands[i], session_numbers[i])
-                or i in range(len(bands))]
+                for i in range(len(bands))]
 
     def convergence_magnitudes_against_time(self) -> List[float]:
         """
@@ -556,7 +555,7 @@ class Session(Model):
         for tup in self.convergence_magnitudes_split():
             sum_of_mags[0] += tup[0]
             sum_of_mags[1] += tup[1]
-        return [round(sum_of_mags[0], 3), round(sum_of_mags[1], 3)]
+        return [sum_of_mags[0], sum_of_mags[1]]
 
     def divergence_magnitudes_split_total(self) -> List[float]:
         """
@@ -567,7 +566,7 @@ class Session(Model):
         for tup in self.divergence_magnitudes_split():
             sum_of_mags[0] += tup[0]
             sum_of_mags[1] += tup[1]
-        return [round(sum_of_mags[0], 3), round(sum_of_mags[1], 3)]
+        return [sum_of_mags[0], sum_of_mags[1]]
 
     @round_by
     def convergence_magnitudes_total(self) -> float:
@@ -965,7 +964,7 @@ class Session(Model):
         df = self.df()
         for value in df[column_header]:
             for i, band in enumerate(bands):
-                if value < band:  # if value is under current band, add value to bag
+                if float(value) < float(band):  # if value is under current band, add value to bag
                     bags[i] += [value]  # after bags is updated, move on to next value
                     break
             bags[-1] += [value]  # if this line is reached then the value must be larger than highest band value,
@@ -998,7 +997,7 @@ class Session(Model):
             if mag != 0:
                 phase = phase_data[i]
                 for j, band in enumerate(phase_bands):
-                    if phase < band:
+                    if float(phase) < float(band):
                         magnitudes_bagged[j] += mag
                         break
                 else:
@@ -1023,7 +1022,7 @@ class Session(Model):
             if mag != 0:
                 frequency = frequency_data[i]
                 for j, band in enumerate(frequency_bands):
-                    if frequency < band:
+                    if float(frequency) < float(band):
                         magnitudes_bagged[j] += mag
                         break
                 else:
@@ -1048,7 +1047,7 @@ class Session(Model):
             if mag != 0:
                 phase = phase_data[i]
                 for j, band in enumerate(phase_bands):
-                    if phase < band:
+                    if float(phase) < float(band):
                         magnitudes_bagged[j] += mag
                         break
                 else:
@@ -1073,7 +1072,7 @@ class Session(Model):
             if mag != 0:
                 frequency = frequency_data[i]
                 for j, band in enumerate(frequency_bands):
-                    if frequency < band:
+                    if float(frequency) < float(band):
                         magnitudes_bagged[j] += mag
                         break
                 else:
