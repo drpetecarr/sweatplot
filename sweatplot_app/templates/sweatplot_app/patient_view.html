@@ -42,10 +42,10 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Number of sessions</th>
-                <th>Mean left shift</th>
-                <th>Right shift</th>
-                <th>Total shift</th>
+                <th><span title="Total number of sessions for this patient">Number of sessions</span></th>
+                <th><span title="Mean of each sessions left shift. Left shift is the difference between start value and end value for the left hand. Negative implies it has dropped.">Mean left shift</span></th>
+                <th><span title="Mean of each sessions right shift. Right shift is the difference between start value and end value for the right hand. Negative implies it has dropped.">Mean right shift</span></th>
+                <th><span title="Mean of each sessions total shift. Total shift is the left shift minus the right shift.">Mean total shift</span></th>
             </tr>
             <tr>
                 <td>{{ number_of_sessions }}</td>
@@ -63,15 +63,15 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <td>Score</td>
+                <td><span title="Mean of convergence score across patients sessions. Score is calculated by frequency, not magnitude.">Mean score</span></th>
                 <td>{{ mean_convergence_score }}</td>
             </tr>
             <tr>
-                <td>Mean of absolute magnitudes</td>
+                <td>Mean of Total absolute magnitudes</td>
                 <td>{{ multiple_sessions.mean_convergence_magnitudes_total }}</td>
             </tr>
             <tr>
-                <td>Mean of absolute magnitudes split by hand</td>
+                <td>Mean of magnitudes split by hand</td>
                 <td>{{ multiple_sessions.mean_convergence_magnitudes_split_total }}</td>
             </tr>
             <tr>
@@ -102,15 +102,15 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <td>Score</td>
+                <td><span title="Mean of divergence score across patients sessions. Score is calculated by frequency, not magnitude.">Mean score</span></th>
                 <td>{{ mean_divergence_score }}</td>
             </tr>
             <tr>
-                <td>Mean of absolute magnitudes</td>
+                <td>Total of absolute magnitudes</td>
                 <td>{{ multiple_sessions.mean_divergence_magnitudes_total }}</td>
             </tr>
             <tr>
-                <td>Mean of absolute magnitudes split by hand</td>
+                <td>Mean of magnitudes split by hand</td>
                 <td>{{ multiple_sessions.mean_divergence_magnitudes_split_total }}</td>
             </tr>
             <tr>

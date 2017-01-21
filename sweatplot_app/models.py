@@ -8,7 +8,6 @@ import os
 import pandas as pd
 import numpy as np
 from typing import List
-import matplotlib
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -264,7 +263,7 @@ class MultipleSessions:
         result = []
         frequency_bands_by_session_number = self.frequency_bands_by_session_number()
         for bands, session_numbers in frequency_bands_by_session_number:
-            sum_divergences = [0] * (len(bands) + 1)
+            sum_convergences = [0] * (len(bands) + 1)
             for num in session_numbers:
                 session = None
                 for s in self.sessions:
@@ -273,13 +272,13 @@ class MultipleSessions:
                         break
                 else:
                     Exception('session numbers don\'t match')
-                divergences = session.divergence_magnitudes_bagged_by_frequency()
-                sum_divergences = [sum_divergences[i] + divergences[i] for i in range(len(sum_divergences))]
+                convergences = session.convergence_magnitudes_bagged_by_frequency()
+                sum_convergences = [sum_convergences[i] + convergences[i] for i in range(len(sum_convergences))]
             d = dict()
             d['index'] = range(len(bands) + 1)
             d['bands'] = bands
             d['session_numbers'] = session_numbers
-            d['result'] = [s / len(session_numbers) for s in sum_divergences]
+            d['result'] = [s / len(session_numbers) for s in sum_convergences]
             assert (len(d['index']) == len(d['result']))
             result.append(d)
         return result
@@ -537,11 +536,15 @@ class Session(Model):
     number = IntegerField(default=0)
     datetime = DateTimeField('date of session')
     csv = FileField('full path to csv', max_length=200)
-    frequency_bands = CharField('frequency bands', max_length=200, default='0.15, 0.5, 1.3, 1.6, 2.4')
+    frequency_bands = CharField('frequency bands', max_length=200, default='0.025, 0.48, 1.22, 1.52')
+    frequency_labels = CharField('frequency labels', max_length=200, default='Off, EMs, Alpha, Beta_1, Beta_2')
     phase_bands = CharField('phase_bands', max_length=200,
-                            default='0.00, 0.313, 0.615, 0.917, 1.211, 1.505, 1.800, 2.093')
+                            default='0.2, 0.6, 1.2, 1.7')
+    phase_labels = CharField('phase labels', max_length=200, default='Off, Async, Alt, Sync, EMs')
     objects = SessionManager()
     _df = None
+    _divergence_magnitudes = None
+    _convergence_magnitudes = None
 
     def __str__(self) -> str:
         return 'Session  ' + str(self.number)
@@ -652,6 +655,8 @@ class Session(Model):
         and with the magnitude of the convergence for every convergent value.
         :return: list[float]
         """
+        if self._convergence_magnitudes is not None:
+            return self._convergence_magnitudes
         left_hand_data = self.left_hand_data()
         right_hand_data = self.right_hand_data()
         magnitudes = [0] * len(right_hand_data)
@@ -666,6 +671,7 @@ class Session(Model):
                 if bot[i] > bot[i - 1]:  # bot is increasing. Therefore they're converging
                     size_of_convergence = top[i - 1] - top[i] + bot[i] - bot[i - 1]
                     magnitudes[i] = size_of_convergence
+        self._convergence_magnitudes = magnitudes
         return magnitudes
 
     @clean_df
@@ -677,6 +683,8 @@ class Session(Model):
         and with the magnitude of the divergence for every divergent value.
         :return: list[float]
         """
+        if self._divergence_magnitudes is not None:
+            return self._divergence_magnitudes
         left_hand_data = self.left_hand_data()
         right_hand_data = self.right_hand_data()
         magnitudes = [0] * len(right_hand_data)
@@ -691,6 +699,7 @@ class Session(Model):
                 if bot[i] < bot[i - 1]:  # bot is decreasing. Therefore they're diverging
                     size_of_divergence = top[i] - top[i - 1] + bot[i - 1] - bot[i]
                     magnitudes[i] = size_of_divergence
+        self._divergence_magnitudes = magnitudes
         return magnitudes
 
     @measure

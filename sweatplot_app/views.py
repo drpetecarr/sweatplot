@@ -202,14 +202,20 @@ def all_sessions_csv_view(request: HttpRequest, patient_name: str, measure: str)
 def bar_chart_view(request: HttpRequest, patient_name: str, session_number: str, measure: str) -> HttpResponse:
     patient = get_object_or_404(Patient, name=patient_name)
     session = get_object_or_404(Session, patient=patient, number=session_number)
-    result = getattr(session, measure)()
+    result = [round(r, 3) for r in getattr(session, measure)()]
     if 'phase' in measure:
-        create_bar_chart(result, range(len(session.phase_bands.split(', ')) + 1), patient, session)
+        x = [str(z) for z in zip(session.phase_labels.split(', '), ['%.4f' % round(r, 4) for r in result])]
+        # create_bar_chart(result, range(len(session.phase_bands.split(', ')) + 1), patient, session)
     elif 'frequency' in measure:
-        create_bar_chart(result, range(len(session.frequency_bands.split(', ')) + 1), patient, session)
+        x = [str(z) for z in zip(session.frequency_labels.split(', '), ['%.4f' % round(r, 4) for r in result])]
+        # create_bar_chart(result, range(len(session.frequency_bands.split(', ')) + 1), patient, session)
     else:
-        create_bar_chart(result, range(len(getattr(session, measure)())), patient, session)
-    return render(request, 'sweatplot_app/bar_chart.html', {})
+        x = [str(z) for z in
+             zip(list(range(len(getattr(session, measure)()) + 1)), ['%.4f' % round(r, 4) for r in result])]
+        # create_bar_chart(result, range(len(getattr(session, measure)())), patient, session)
+    return render(request, 'sweatplot_app/bar_chart.html',
+                  {'x': x, 'y': result,
+                   'title': patient.name + '  (session: ' + str(session.number) + ')'})
 
 
 def measure_view(request: HttpRequest, patient_name: str, session_number: str, measure: str) -> HttpResponse:
@@ -230,5 +236,9 @@ def all_sessions_bar_chart_view(request: HttpRequest, patient_name: str, measure
     patient = get_object_or_404(Patient, name=patient_name)
     sessions = MultipleSessions(get_list_or_404(Session, patient=patient))
     results = getattr(sessions, measure)()
+    y_data = [df['result'] for df in results]
+    lbl_data = [df['bands'] for df in results]
     create_multiple_bar_charts(results, ['temp_plot' + str(i) + '.jpg' for i in range(len(results))], patient)
-    return render(request, 'sweatplot_app/multiple_bar_charts.html', {})
+    return render(request, 'sweatplot_app/multiple_bar_charts.html', {'y': y_data, 'lbls': lbl_data,
+                                                                      'sessions': sessions,
+                                                                      'patient': patient})

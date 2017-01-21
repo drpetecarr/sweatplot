@@ -2,3 +2,76 @@
     {% load staticfiles %}
     <img src="{% static "sweatplot_app/temp_plot0.jpg" %}"/>
 </body>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+	<!--<head>-->
+		<!--<meta charset="utf-8">-->
+		<!--<title>{{ title }}</title>-->
+		<!--<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>-->
+		<!--<style type="text/css">-->
+			<!--/* No style rules here yet */-->
+		<!--</style>-->
+	<!--</head>-->
+	<!--<body>-->
+		<!--<script type="text/javascript">-->
+
+			<!--//Width and height-->
+			<!--var w = 800;-->
+			<!--var h = 600;-->
+			<!--var barPadding = 1;-->
+
+			<!--var dataset = {{ y|safe }};-->
+			<!--var dataset = dataset[0];-->
+			<!--var lbls = {{ lbls|safe }}-->
+			<!--var lbls = lbls[0]-->
+
+            <!--var max = Math.max.apply(Math, dataset);-->
+
+			<!--//Create SVG element-->
+			<!--var svg = d3.select("body")-->
+						<!--.append("svg")-->
+						<!--.attr("width", w)-->
+						<!--.attr("height", h);-->
+
+			<!--svg.selectAll("rect")-->
+			   <!--.data(dataset)-->
+			   <!--.enter()-->
+			   <!--.append("rect")-->
+			   <!--.attr("x", function(d, i) {-->
+			   		<!--return i * (w / dataset.length);-->
+			   <!--})-->
+			   <!--.attr("y", function(d) {-->
+			   		<!--return h - (h * d / max);-->
+			   <!--})-->
+			   <!--.attr("width", w / dataset.length - barPadding)-->
+			   <!--.attr("height", function(d) {-->
+			   		<!--return h * d / max;-->
+			   <!--})-->
+			   <!--.attr("fill", function(d) {-->
+					<!--return "rgb(0, 0, 250)";-->
+			   <!--});-->
+
+			<!--svg.selectAll("text")-->
+			   <!--.data(lbls)-->
+			   <!--.enter()-->
+			   <!--.append("text")-->
+			   <!--.text(function(d) {-->
+			   		<!--return d;-->
+			   <!--})-->
+			   <!--.attr("text-anchor", "middle")-->
+			   <!--.attr("x", function(d, i) {-->
+			   		<!--return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;-->
+			   <!--})-->
+			   <!--.attr("y", function(d) {-->
+			   		<!--return h - 14;-->
+			   <!--})-->
+			   <!--.attr("font-family", "sans-serif")-->
+			   <!--.attr("font-size", "14px")-->
+			   <!--.attr("fill", "black");-->
+
+
+
+		<!--</script>-->
+	<!--</body>-->
+<!--</html>-->
